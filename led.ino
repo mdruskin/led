@@ -83,10 +83,10 @@ int pulseMovePeriod = 2;
 bool up = true;
 byte basePulseHue = 0;
 byte pulseHue;
-byte backgroundHue = 128;
+byte backgroundPulseHue = 128;
 long lastPulseBackgroundMillis = 0;
-int pulseBackgroundPeriod = 1000;
-byte backgroundHeat = 64;
+int pulseBackgroundPeriod = 4000;
+byte backgroundPulseHeat = 64;
 void pulse() {      
   if (periodToggle(lastPulseMillis, pulsePeriod)) {
     // generate new pulse length and hue
@@ -102,7 +102,7 @@ void pulse() {
 
   // if we are at the bottom, just fill backfround
   if (!up && currentLed <= 0) {
-    fill_solid(leds, NUM_LEDS, CHSV(backgroundHue, 255, backgroundHeat));
+    fill_solid(leds, NUM_LEDS, CHSV(backgroundPulseHue, 255, backgroundPulseHeat));
     return;
   }
 
@@ -113,15 +113,15 @@ void pulse() {
       if (up) {        
         leds[i] = CHSV(pulseHue, 255, value);
       } else {
-        leds[i] = CHSV(backgroundHue, 255, backgroundHeat);        
+        leds[i] = CHSV(backgroundPulseHue, 255, backgroundPulseHeat);        
       }
     }
     // head of the pulse
-    leds[currentLed] = CHSV(pulseHue, 200, 255);
+    leds[currentLed] = CHSV(pulseHue, 220, 255);
 
     // background
     for (int i = currentLed + 1; i < NUM_LEDS; i++) {
-      leds[i] = CHSV(backgroundHue, 255, backgroundHeat);
+      leds[i] = CHSV(backgroundPulseHue, 255, backgroundPulseHeat);
     }
   
     if (up)
@@ -130,9 +130,9 @@ void pulse() {
       currentLed -= pulseLength / 40;
   }  
 
-  if (periodToggle(lastPulseBackgroundMillis, pulseBackgroundPeriod)) {    
+  if (periodToggle(lastPulseBackgroundMillis, pulseBackgroundPeriod)) {
     basePulseHue++; 
-    backgroundHue++;
+    backgroundPulseHue++;
   }
 }
 
@@ -140,10 +140,14 @@ void pulse() {
 // ******    shimmer       ******** //
 //////////////////////////////////////
 byte heatShimmer[NUM_LEDS];
+bool heatShimmerUpDown[NUM_LEDS];
 long lastShimmerMillis = 0;
 byte shimmerPeriod = 10;
-byte shimmerDiff = 3;
-byte hueShimmer = 160;
+byte shimmerDiff = 1;
+byte shimmerHue = 160;
+long lastShimmerHueMillis = 0;
+int shimmerHuePeriod = 4000;
+
 void shimmer() {
   if (!periodToggle(lastShimmerMillis, shimmerPeriod))
     return;
@@ -152,22 +156,29 @@ void shimmer() {
     // setup
     for (int i = 0; i < NUM_LEDS; i++) {
       heatShimmer[i] = 200;
+      heatShimmerUpDown[i] = random8(2);
     }
   }
 
-  // now randomly raise heat up and down
+  // now raise heat up and down
   for (int i = 0; i < NUM_LEDS; i++) {
-    byte upOrDown = random8(2);
-    if (upOrDown && heatShimmer[i] < 255)
+    // randomly change direction for some of them
+    if (random8(100) < 1) // 1% of the time
+      heatShimmerUpDown[i] = !heatShimmerUpDown[i];
+      
+    if (heatShimmerUpDown[i] && heatShimmer[i] < 256 - shimmerDiff)
       heatShimmer[i] += shimmerDiff;
-    if (!upOrDown && heatShimmer[i] > 128)
+    if (!heatShimmerUpDown[i] && heatShimmer[i] > 64 + shimmerDiff)
       heatShimmer[i] -= shimmerDiff;
   }    
 
   for (int i = 0; i < NUM_LEDS; i++) {
-    leds[i] = CHSV(hueShimmer, 255, heatShimmer[i]);
+    leds[i] = CHSV(shimmerHue, 255, heatShimmer[i]);
   }
 
+  if (periodToggle(lastShimmerHueMillis, shimmerHuePeriod)) {
+    shimmerHue++;
+  }
 }
 
 //////////////////////////////////////
@@ -191,8 +202,8 @@ long lastCoolingMillis = 0;
 // hsv: 0 - red, 64 - yellow, 96 - green, 160 - blue
 byte startHue = 128; // range of twinkle hues will start from this hue
 byte hueRange = 40; // and go up this many hues
-byte hueIncrement = 5; // and every 10 sec it will increment by this much
-int huePeriodMillis = 10000;
+byte hueIncrement = 1; // and every huePeriodMillis it will increment by this much
+int huePeriodMillis = 4000;
 long lastHueMillis = 0;
 
 void twinkle() {  
@@ -234,22 +245,6 @@ void twinkle() {
   for (int i = 0; i < NUM_LEDS; i++) {
     leds[i] = CHSV(hue[i], 255, heat[i]);
   }
-}
-
-//////////////////////////////////////
-// *********  movingRedDot  ******* //
-//////////////////////////////////////
-int dotLocation = 0;
-int dotSpeed = 1;
-void movingRedDot() {  
-  fill_solid(leds, NUM_LEDS, CRGB::Blue);
-  int dotColor = CRGB::Red;
-  leds[dotLocation] = dotColor;
-  leds[dotLocation + 1] = dotColor;
-  leds[dotLocation + 2] = dotColor;
-  dotLocation += dotSpeed;
-  if (dotLocation >= NUM_LEDS - 2)
-    dotLocation = 0;
 }
 
 //////////////////////////////////////
@@ -297,7 +292,7 @@ void drawFrame() {
     movingRainbow(15);
   }
   if (currentMode == 1) {    
-    movingRainbow(2000);
+    movingRainbow(4000);
   }
   if (currentMode == 2) {
     twinkle();
