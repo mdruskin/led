@@ -5,7 +5,7 @@
 #define BRIGHTNESS_BUTTON_PIN 6
 #define MODE_BUTTON_PIN 7
 #define SOUND_PIN 8
-#define LOOP_DELAY 10
+#define LOOP_DELAY 1
 #define BRIGHTNESS 64
 
 CRGB leds[NUM_LEDS];
@@ -79,7 +79,7 @@ int currentLed = 0;
 long lastPulseMillis = 0;
 int pulsePeriod = 1000;
 long lastPulseMoveMillis = 0;
-int pulseMovePeriod = 10;
+int pulseMovePeriod = 2;
 bool up = true;
 byte basePulseHue = 0;
 byte pulseHue;
@@ -100,28 +100,34 @@ void pulse() {
   if (currentLed >= pulseLength)
     up = false;
 
-  // if we are at the bottom, do nothing
-  if (!up && currentLed <= 0)
+  // if we are at the bottom, just fill backfround
+  if (!up && currentLed <= 0) {
+    fill_solid(leds, NUM_LEDS, CHSV(backgroundHue, 255, backgroundHeat));
     return;
+  }
 
   if (periodToggle(lastPulseMoveMillis, pulseMovePeriod)) {
+    // tail of the pulse
     for (int i = 0; i < currentLed; i++) {
-      if (up) {
-        byte value = 128 - i * (128 / pulseLength);
+      byte value = 128 - i * (128 / pulseLength);
+      if (up) {        
         leds[i] = CHSV(pulseHue, 255, value);
       } else {
-        leds[i] = CHSV(backgroundHue, 255, backgroundHeat);
+        leds[i] = CHSV(backgroundHue, 255, backgroundHeat);        
       }
     }
-    leds[currentLed] = CHSV(pulseHue, 255, 255);
+    // head of the pulse
+    leds[currentLed] = CHSV(pulseHue, 200, 255);
+
+    // background
     for (int i = currentLed + 1; i < NUM_LEDS; i++) {
       leds[i] = CHSV(backgroundHue, 255, backgroundHeat);
     }
   
     if (up)
-      currentLed += pulseLength / 10;
+      currentLed += pulseLength / 25;
     else
-      currentLed -= pulseLength / 15;
+      currentLed -= pulseLength / 40;
   }  
 
   if (periodToggle(lastPulseBackgroundMillis, pulseBackgroundPeriod)) {    
