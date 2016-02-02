@@ -39,13 +39,13 @@ bool isButtonToggle(int &buttonToggle, int pin) {
 //////////////////////////////////////
 // *********  periodToggle  ******* //
 //////////////////////////////////////
-// lasMillis: a global long to keep track of millis
+// lastMillis: a global long to keep track of millis
 // periodMillis: how often should the period trigger
 // returns: time since lastMillis, or 0 if period didn't trigger
 int periodToggle(long &lastMillis, int periodMillis) {
   long currentMillis = millis();
   long millisPassed = currentMillis - lastMillis;
-  if (millisPassed > periodMillis) {
+  if (millisPassed >= periodMillis) {
     lastMillis = currentMillis;
     return millisPassed;
   }
@@ -72,21 +72,54 @@ bool isSoundOn(int soundEffectLength) {
 }
 
 //////////////////////////////////////
+// ******    shimmer       ******** //
+//////////////////////////////////////
+byte heatShimmer[NUM_LEDS];
+long lastShimmerMillis = 0;
+byte shimmerPeriod = 50;
+byte hueShimmer = 160;
+void shimmer() {
+  if (!periodToggle(lastShimmerMillis, shimmerPeriod))
+    return;
+    
+  if (heatShimmer[0] == 0) {
+    // setup
+    for (int i = 0; i < NUM_LEDS; i++) {
+      heatShimmer[i] = 200;
+    }
+  }
+
+  // now randomly raise heat up and down
+  for (int i = 0; i < NUM_LEDS; i++) {
+    byte upOrDown = random8(2);
+    if (upOrDown && heatShimmer[i] < 255)
+      heatShimmer[i] += 5;
+    if (!upOrDown && heatShimmer[i] > 128)
+      heatShimmer[i] -= 5;
+  }    
+
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CHSV(hueShimmer, 255, heatShimmer[i]);
+  }
+
+}
+
+//////////////////////////////////////
 // ******    twinkle       ******** //
 //////////////////////////////////////
 byte heat[NUM_LEDS];
 byte hue[NUM_LEDS];
 
 // how many and how quickly new twinkles appear
-byte maxNewTwinkles = 10;
+byte maxNewTwinkles = 7;
 byte additionalSoundTwinkles = 25;
-int twinklePeriodMillis = 500;
+int twinklePeriodMillis = 250;
 long lastTwinkleMillis = 0;
 long lastSoundMillis = 0;
 
 // coling - how fast the twinkles dim
-byte cooling = 2;
-int coolingPeriodMillis = 20;
+byte cooling = 1;
+int coolingPeriodMillis = 30;
 long lastCoolingMillis = 0;
 
 // hsv: 0 - red, 64 - yellow, 96 - green, 160 - blue
@@ -161,13 +194,11 @@ void movingRedDot() {
 int startPosition = 0;
 long lastMillis = 0;
 void movingRainbow(int moveEveryMillis) {
-  long currentMillis = millis();
-  long millisPassed = currentMillis - lastMillis;
-  if (millisPassed >= moveEveryMillis) {
-    lastMillis = currentMillis;
+  long millisPassed = periodToggle(lastMillis, moveEveryMillis);
+  if (millisPassed > 0) {    
     startPosition += millisPassed / moveEveryMillis;
   }
-    
+      
   fill_rainbow(leds, NUM_LEDS, startPosition, 1);
 }
 
@@ -188,22 +219,25 @@ void adjustBrightness() {
 //////////////////////////////////////
 // ******    MAIN LOOP     ******** //
 //////////////////////////////////////
-int currentMode = 0;
+int currentMode = 2;
 int modeToggle = 1;
 void drawFrame() {
   if (isButtonToggle(modeToggle, MODE_BUTTON_PIN)) {
-    currentMode = (currentMode + 1) % 3;
+    currentMode = (currentMode + 1) % 4;
     Serial.print("New Mode:");
     Serial.println(currentMode);
   }
   if (currentMode == 0) {
-    movingRainbow(20);
+    movingRainbow(15);
   }
   if (currentMode == 1) {    
     movingRainbow(1000);
   }
   if (currentMode == 2) {
     twinkle();
+  }
+  if (currentMode == 3) {
+    shimmer();
   }
   adjustBrightness();
 }
