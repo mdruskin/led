@@ -72,11 +72,71 @@ bool isSoundOn(int soundEffectLength) {
 }
 
 //////////////////////////////////////
+// ******      Pulse       ******** //
+//////////////////////////////////////
+int pulseLength = 0;
+int currentLed = 0;
+long lastPulseMillis = 0;
+int pulsePeriod = 1000;
+long lastPulseMoveMillis = 0;
+int pulseMovePeriod = 10;
+bool up = true;
+byte basePulseHue = 0;
+byte pulseHue;
+byte backgroundHue = 128;
+long lastPulseBackgroundMillis = 0;
+int pulseBackgroundPeriod = 1000;
+byte backgroundHeat = 64;
+void pulse() {      
+  if (periodToggle(lastPulseMillis, pulsePeriod)) {
+    // generate new pulse length and hue
+    pulseLength = random16(60, 160);
+    pulseHue = random8(basePulseHue, basePulseHue + 16);
+    currentLed = 0;
+    up = true;
+  }
+  
+  // if we reached the top, go down
+  if (currentLed >= pulseLength)
+    up = false;
+
+  // if we are at the bottom, do nothing
+  if (!up && currentLed <= 0)
+    return;
+
+  if (periodToggle(lastPulseMoveMillis, pulseMovePeriod)) {
+    for (int i = 0; i < currentLed; i++) {
+      if (up) {
+        byte value = 128 - i * (128 / pulseLength);
+        leds[i] = CHSV(pulseHue, 255, value);
+      } else {
+        leds[i] = CHSV(backgroundHue, 255, backgroundHeat);
+      }
+    }
+    leds[currentLed] = CHSV(pulseHue, 255, 255);
+    for (int i = currentLed + 1; i < NUM_LEDS; i++) {
+      leds[i] = CHSV(backgroundHue, 255, backgroundHeat);
+    }
+  
+    if (up)
+      currentLed += pulseLength / 10;
+    else
+      currentLed -= pulseLength / 15;
+  }  
+
+  if (periodToggle(lastPulseBackgroundMillis, pulseBackgroundPeriod)) {    
+    basePulseHue++; 
+    backgroundHue++;
+  }
+}
+
+//////////////////////////////////////
 // ******    shimmer       ******** //
 //////////////////////////////////////
 byte heatShimmer[NUM_LEDS];
 long lastShimmerMillis = 0;
-byte shimmerPeriod = 50;
+byte shimmerPeriod = 10;
+byte shimmerDiff = 3;
 byte hueShimmer = 160;
 void shimmer() {
   if (!periodToggle(lastShimmerMillis, shimmerPeriod))
@@ -93,9 +153,9 @@ void shimmer() {
   for (int i = 0; i < NUM_LEDS; i++) {
     byte upOrDown = random8(2);
     if (upOrDown && heatShimmer[i] < 255)
-      heatShimmer[i] += 5;
+      heatShimmer[i] += shimmerDiff;
     if (!upOrDown && heatShimmer[i] > 128)
-      heatShimmer[i] -= 5;
+      heatShimmer[i] -= shimmerDiff;
   }    
 
   for (int i = 0; i < NUM_LEDS; i++) {
@@ -105,7 +165,7 @@ void shimmer() {
 }
 
 //////////////////////////////////////
-// ******    twinkle       ******** //
+// ******     twinkle      ******** //
 //////////////////////////////////////
 byte heat[NUM_LEDS];
 byte hue[NUM_LEDS];
@@ -219,11 +279,11 @@ void adjustBrightness() {
 //////////////////////////////////////
 // ******    MAIN LOOP     ******** //
 //////////////////////////////////////
-int currentMode = 2;
+int currentMode = 4;
 int modeToggle = 1;
 void drawFrame() {
   if (isButtonToggle(modeToggle, MODE_BUTTON_PIN)) {
-    currentMode = (currentMode + 1) % 4;
+    currentMode = (currentMode + 1) % 5;
     Serial.print("New Mode:");
     Serial.println(currentMode);
   }
@@ -231,13 +291,16 @@ void drawFrame() {
     movingRainbow(15);
   }
   if (currentMode == 1) {    
-    movingRainbow(1000);
+    movingRainbow(2000);
   }
   if (currentMode == 2) {
     twinkle();
   }
   if (currentMode == 3) {
     shimmer();
+  }
+  if (currentMode == 4) {
+    pulse();
   }
   adjustBrightness();
 }
