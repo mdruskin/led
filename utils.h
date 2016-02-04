@@ -57,21 +57,21 @@ int isSoundOn() {
   // adjust average
   //soundTotal = soundTotal - soundHistory[historyIndex];
   //soundTotal = soundTotal + currentSound;
-  soundHistory[historyIndex] = currentSound;  
+  soundHistory[historyIndex] = currentSound;
   historyIndex = (historyIndex + 1) % 255;
 
   soundTotal = 0;
   int moreThan = 0;
   for (int i = 0; i < 255; i++) {
     soundTotal += soundHistory[i];
-    if (soundHistory[i] < currentSound) 
+    if (soundHistory[i] < currentSound)
       moreThan++;
   }
 
   average = (double) soundTotal / 255.0;
 
   if (moreThan > 250) {
-    Serial.println(currentSound);    
+    Serial.println(currentSound);
   }
 
   return moreThan;
