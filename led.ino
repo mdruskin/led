@@ -49,7 +49,7 @@ void drawFrame() {
       pulse::draw(leds);
       break;
     case 5:
-      wanderer::go(leds);
+      wanderer::draw(leds);
       break;
   }
   adjustBrightness();
