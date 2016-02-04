@@ -9,7 +9,7 @@
 #define MODE_BUTTON_PIN 7
 #define LOOP_DELAY 1
 #define BRIGHTNESS 64
-#define SOUND_PIN 8
+#define SOUND_PIN 0
 
 //////////////////////////////////////
 // ********* isButtonToggle ******* //
@@ -45,20 +45,50 @@ int periodToggle(long &lastMillis, int periodMillis) {
 //////////////////////////////////////
 // *********   isSoundOn    ******* //
 //////////////////////////////////////
-// returns true if sound is on and will
-// continue returning true for a specified period
-long lastMillisSound = 0;
-bool isSoundOn(int soundEffectLength) {
-  bool result = false;
-  long currentMillis = millis();
-  if ((currentMillis - lastMillisSound < soundEffectLength)) {
-    result = true;
+// returns how many elements in the past 255 samples
+// are smaller than the current sound. 250 is a good threshold
+double average = 1;
+int soundHistory[255];
+int historyIndex = 0;
+int soundTotal = 0;
+int isSoundOn() {
+  int currentSound = analogRead(SOUND_PIN);
+
+  // adjust average
+  //soundTotal = soundTotal - soundHistory[historyIndex];
+  //soundTotal = soundTotal + currentSound;
+  soundHistory[historyIndex] = currentSound;  
+  historyIndex = (historyIndex + 1) % 255;
+
+  soundTotal = 0;
+  int moreThan = 0;
+  for (int i = 0; i < 255; i++) {
+    soundTotal += soundHistory[i];
+    if (soundHistory[i] < currentSound) 
+      moreThan++;
   }
-  if (digitalRead(SOUND_PIN)) {
-    result = true;
-    lastMillisSound = currentMillis;
+
+  average = (double) soundTotal / 255.0;
+
+  if (moreThan > 250) {
+    Serial.println(currentSound);    
   }
-  return result;
+
+  return moreThan;
+}
+
+//////////////////////////////////////
+// ****** adjustBrightness ******** //
+//////////////////////////////////////
+int brightnessButtonToggle = 1;
+byte brightness = 4;
+byte brightnessValues[] = { 4, 8, 16, 32, 64, 128, 255 };
+void adjustBrightness() {
+  if (isButtonToggle(brightnessButtonToggle, BRIGHTNESS_BUTTON_PIN)) {
+    brightness = brightness + 1;
+    if (brightness > 6) brightness = 0;
+    FastLED.setBrightness(brightnessValues[brightness]);
+  }
 }
 
 #endif
