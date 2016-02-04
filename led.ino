@@ -1,17 +1,21 @@
 #include "FastLED.h"
 
+#include "utils.h"
+#include "wanderer.h"
+
+/*
 #define NUM_LEDS 240
 #define LED_PIN 4
 #define BRIGHTNESS_BUTTON_PIN 6
 #define MODE_BUTTON_PIN 7
-#define SOUND_PIN 8
 #define LOOP_DELAY 1
 #define BRIGHTNESS 64
+*/
 
 CRGB leds[NUM_LEDS];
 int program = 0;
 
-void setup() { 
+void setup() {
   delay(1000);
   Serial.begin(9600);
   FastLED.addLeds<NEOPIXEL, LED_PIN>(leds, NUM_LEDS);
@@ -19,56 +23,6 @@ void setup() {
   pinMode(BRIGHTNESS_BUTTON_PIN, INPUT);
   pinMode(MODE_BUTTON_PIN, INPUT);
   pinMode(SOUND_PIN, INPUT);
-}
-
-//////////////////////////////////////
-// ********* isButtonToggle ******* //
-//////////////////////////////////////
-// buttonToggle: a global flag that should start off at 1
-// pin: the pin id of the button
-bool isButtonToggle(int &buttonToggle, int pin) {
-  int buttonValue = digitalRead(pin);
-  if (buttonValue != buttonToggle && buttonValue == 0) {
-    buttonToggle = buttonValue;
-    return true;
-  }
-  buttonToggle = buttonValue;
-  return false;
-}
-
-//////////////////////////////////////
-// *********  periodToggle  ******* //
-//////////////////////////////////////
-// lastMillis: a global long to keep track of millis
-// periodMillis: how often should the period trigger
-// returns: time since lastMillis, or 0 if period didn't trigger
-int periodToggle(long &lastMillis, int periodMillis) {
-  long currentMillis = millis();
-  long millisPassed = currentMillis - lastMillis;
-  if (millisPassed >= periodMillis) {
-    lastMillis = currentMillis;
-    return millisPassed;
-  }
-  return 0;
-}
-
-//////////////////////////////////////
-// *********   isSoundOn    ******* //
-//////////////////////////////////////
-// returns true if sound is on and will
-// continue returning true for a specified period
-long lastMillisSound = 0;
-bool isSoundOn(int soundEffectLength) {
-  bool result = false;
-  long currentMillis = millis();
-  if ((currentMillis - lastMillisSound < soundEffectLength)) {
-    result = true;
-  }
-  if (digitalRead(SOUND_PIN)) {
-    result = true;
-    lastMillisSound = currentMillis;
-  }
-  return result;
 }
 
 //////////////////////////////////////
@@ -280,11 +234,11 @@ void adjustBrightness() {
 //////////////////////////////////////
 // ******    MAIN LOOP     ******** //
 //////////////////////////////////////
-int currentMode = 4;
+int currentMode = 6;
 int modeToggle = 1;
 void drawFrame() {
   if (isButtonToggle(modeToggle, MODE_BUTTON_PIN)) {
-    currentMode = (currentMode + 1) % 5;
+    currentMode = (currentMode + 1) % 6;
     Serial.print("New Mode:");
     Serial.println(currentMode);
   }
@@ -303,6 +257,9 @@ void drawFrame() {
   if (currentMode == 4) {
     pulse();
   }
+  if (currentMode == 5) {
+    wanderer::go(leds);
+  }
   adjustBrightness();
 }
 
@@ -311,4 +268,3 @@ void loop() {
   FastLED.show();
   delay(LOOP_DELAY);
 }
-
