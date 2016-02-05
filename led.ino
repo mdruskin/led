@@ -1,3 +1,11 @@
+#define LOOP_DELAY 5
+#define BRIGHTNESS 64
+#define NUM_LEDS 240
+#define LED_PIN 4
+#define BRIGHTNESS_BUTTON_PIN 6
+#define MODE_BUTTON_PIN 7
+#define SOUND_PIN 0
+
 #include "FastLED.h"
 
 #include "utils.h"
@@ -34,10 +42,10 @@ void drawFrame() {
   }
   switch (currentMode) {
     case 0:
-      movingRainbow::draw(leds, 15);
+      movingRainbow::draw(leds, 20);
       break;
     case 1:
-      movingRainbow::draw(leds, 4000);
+      movingRainbow::draw(leds, 3000);
       break;
     case 2:
       twinkle::draw(leds);

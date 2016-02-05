@@ -28,8 +28,6 @@ namespace twinkle {
   long lastHueMillis = 0;
 
   void draw(CRGB leds[NUM_LEDS]) {
-    random16_add_entropy(random()); // improves randomness
-
     // Cool everything down
     if (periodToggle(lastCoolingMillis, coolingPeriodMillis)) {
       for (int i = 0; i < NUM_LEDS; i++) {
@@ -38,8 +36,10 @@ namespace twinkle {
     }
 
     // add new twinkles
-    bool soundBurst = isSoundOn() && periodToggle(lastSoundMillis, twinklePeriodMillis);
+    bool soundBurst = isSoundOn() > 254 && periodToggle(lastSoundMillis, twinklePeriodMillis);
     if (periodToggle(lastTwinkleMillis, twinklePeriodMillis) || soundBurst) {
+      random16_add_entropy(random()); // improves randomness
+
       int numTwinkles = random16(0, maxNewTwinkles);
       if (soundBurst) numTwinkles += additionalSoundTwinkles;
 

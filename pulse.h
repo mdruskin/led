@@ -15,15 +15,15 @@ namespace pulse {
   bool up = true;
   byte basePulseHue = 0;
   byte pulseHue;
-  byte backgroundPulseHue = 128;
+  byte backgroundPulseHue = 160;
   long lastPulseBackgroundMillis = 0;
   int pulseBackgroundPeriod = 4000;
-  byte backgroundPulseHeat = 64;
+  byte backgroundPulseHeat = 128;
 
   void draw(CRGB leds[NUM_LEDS]) {
     if (periodToggle(lastPulseMillis, pulsePeriod)) {
       // generate new pulse length and hue
-      pulseLength = random16(60, 160);
+      pulseLength = random16(80, 200);
       pulseHue = random8(basePulseHue, basePulseHue + 16);
       currentLed = 0;
       up = true;

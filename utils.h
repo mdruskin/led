@@ -3,14 +3,6 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
-#define NUM_LEDS 240
-#define LED_PIN 4
-#define BRIGHTNESS_BUTTON_PIN 6
-#define MODE_BUTTON_PIN 7
-#define LOOP_DELAY 1
-#define BRIGHTNESS 64
-#define SOUND_PIN 0
-
 //////////////////////////////////////
 // ********* isButtonToggle ******* //
 //////////////////////////////////////
