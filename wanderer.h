@@ -4,17 +4,19 @@
 #ifndef __WANDERER_H__
 #define __WANDERER_H__
 
-#define numWanderers 25
+#define numWanderers 20
 
 namespace wanderer {
   bool isInitialized = false;
 
-  long currentMillis = 0;
-  int periodMillis = 88;
+  long currentMillis = 0;  
+  int periodMillis = 100;
+
+  long bgMillis = 0;
+  int bgPeriodMillis = 2000;
 
   byte bgHue = 0;
-  int bgRate = 4;
-
+  
   int currents[numWanderers];
   bool directions[numWanderers];
   byte lengths[numWanderers];
@@ -23,19 +25,16 @@ namespace wanderer {
 
   void init(CRGB leds[NUM_LEDS]) {
     for (int i = 0; i < numWanderers; i ++) {
-      currents[i] = random8();
+      currents[i] = random8(NUM_LEDS);
       hues[i] = random8();
       speeds[i] = random8(1, 12);
     }
   }
 
   void bg(CRGB leds[NUM_LEDS]) {
-    bgRate --;
-    if (bgRate <= 0) {
+    if (periodToggle(bgMillis, bgPeriodMillis))
       bgHue ++;
-      bgRate = 4;
-    }
-
+      
     for (int i = 0; i < NUM_LEDS; i ++) {
       leds[i] = CHSV(bgHue, 255, 64);
     }
