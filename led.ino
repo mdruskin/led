@@ -14,6 +14,8 @@
 #include "shimmer.h"
 #include "twinkle.h"
 #include "wanderer.h"
+//#include "climb.h"
+//#include "round_and_round.h"
 
 CRGB leds[NUM_LEDS];
 int program = 0;
@@ -31,8 +33,8 @@ void setup() {
 //////////////////////////////////////
 // ******    MAIN LOOP     ******** //
 //////////////////////////////////////
-int currentMode = 0;
-int totalModes = 6;
+int currentMode = 7;
+int totalModes = 8;
 int modeToggle = 1;
 void drawFrame() {
   if (isButtonToggle(modeToggle, MODE_BUTTON_PIN)) {
@@ -58,6 +60,12 @@ void drawFrame() {
       break;
     case 5:
       wanderer::draw(leds);
+      break;
+    case 6:
+      //climb::draw(leds);
+      break;
+    case 7:
+      round_and_round::draw(leds);
       break;
   }
   adjustBrightness();

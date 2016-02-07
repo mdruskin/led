@@ -5,6 +5,36 @@
 #define __WANDERER_H__
 
 #define numWanderers 20
+#define NUM_COLOURS 8
+
+namespace round_and_round {
+  long currentMillis = 0;
+  long periodMillis = 333;
+
+  int currentColour = 0;
+  // colour constants from:
+  // https://github.com/FastLED/FastLED/wiki/Pixel-reference#chsv
+  CHSV colours[NUM_COLOURS] = {
+    CHSV(HUE_RED, 255, 64),
+    CHSV(HUE_ORANGE, 255, 64),
+    CHSV(HUE_YELLOW, 255, 64),
+    CHSV(HUE_GREEN, 255, 64),
+    CHSV(HUE_AQUA, 255, 64),
+    CHSV(HUE_BLUE, 255, 64),
+    CHSV(HUE_PURPLE, 255, 64),
+    CHSV(HUE_PINK, 255, 64)
+  };
+
+  void draw(CRGB leds[NUM_LEDS]) {
+    if (!periodToggle(currentMillis, periodMillis)) return;
+
+    for (int i = 0; i < NUM_LEDS; i ++) {
+      leds[i] = colours[currentColour];
+    }
+
+    currentColour = (currentColour + 1) % NUM_COLOURS;
+  }
+}
 
 namespace wanderer {
   bool isInitialized = false;
@@ -73,7 +103,7 @@ namespace wanderer {
 
     // actually draw it
     for (int i = 0; i < numWanderers; i ++) {
-      leds[currents[i]] = CHSV(hues[i], 255, 255);
+      leds[currents[i]] = CHSV(hues[i], 0, 255);
     }
   }
 }
