@@ -9,14 +9,14 @@
 namespace wanderer {
   bool isInitialized = false;
 
-  long currentMillis = 0;  
+  long currentMillis = 0;
   int periodMillis = 100;
 
   long bgMillis = 0;
   int bgPeriodMillis = 2000;
 
   byte bgHue = 0;
-  
+
   int currents[numWanderers];
   bool directions[numWanderers];
   byte lengths[numWanderers];
@@ -25,16 +25,16 @@ namespace wanderer {
 
   void init(CRGB leds[NUM_LEDS]) {
     for (int i = 0; i < numWanderers; i ++) {
-      currents[i] = random8(NUM_LEDS);
-      hues[i] = random8();
-      speeds[i] = random8(1, 12);
+      currents[i] = random16(NUM_LEDS);
+      hues[i] = random16();
+      speeds[i] = random16(1, 12);
     }
   }
 
   void bg(CRGB leds[NUM_LEDS]) {
     if (periodToggle(bgMillis, bgPeriodMillis))
       bgHue ++;
-      
+
     for (int i = 0; i < NUM_LEDS; i ++) {
       leds[i] = CHSV(bgHue, 255, 64);
     }

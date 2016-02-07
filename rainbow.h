@@ -17,6 +17,7 @@ namespace movingRainbow {
       startPosition += millisPassed / moveEveryMillis;
     }
 
+    // the last param is "hue increment": [1, 255]
     fill_rainbow(leds, NUM_LEDS, startPosition, 1);
   }
 }
