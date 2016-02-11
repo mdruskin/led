@@ -1,6 +1,6 @@
 #define LOOP_DELAY 5
 #define BRIGHTNESS 64
-#define NUM_LEDS 240
+#define NUM_LEDS 480
 #define LED_PIN 4
 #define BRIGHTNESS_BUTTON_PIN 6
 #define MODE_BUTTON_PIN 7
@@ -33,7 +33,7 @@ void setup() {
 //////////////////////////////////////
 // ******    MAIN LOOP     ******** //
 //////////////////////////////////////
-int currentMode = 7;
+int currentMode = 0;
 int totalModes = 8;
 int modeToggle = 1;
 void drawFrame() {
@@ -63,6 +63,8 @@ void drawFrame() {
       break;
     case 6:
       //climb::draw(leds);
+      //volume_climb::draw(leds);
+      accordian::draw(leds);
       break;
     case 7:
       round_and_round::draw(leds);

@@ -83,4 +83,13 @@ void adjustBrightness() {
   }
 }
 
+// true if the previous color was different from new color, false otherwise
+bool setIf(CRGB leds[NUM_LEDS], int i, CHSV newValue) {
+  if (leds[i] != newValue) {
+    leds[i] = newValue;
+    return true;
+  }
+  return false;
+}
+
 #endif
