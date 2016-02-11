@@ -46,19 +46,19 @@ int currentPattern = 0;
 void usePattern(int n) {
   switch (n) {
     case 0:
-      movingRainbow::draw(leds, 20);
+      shimmer::draw(leds);
       break;
     case 1:
-      movingRainbow::draw(leds, 3000);
+      movingRainbow::draw(leds, 20);
       break;
     case 2:
       twinkle::draw(leds);
       break;
     case 3:
-      shimmer::draw(leds);
+      pulse::draw(leds);
       break;
     case 4:
-      pulse::draw(leds);
+      movingRainbow::draw(leds, 3000);
       break;
     case 5:
       wanderer::draw(leds);
