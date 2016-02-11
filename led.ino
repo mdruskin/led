@@ -32,7 +32,7 @@ void setup() {
 //////////////////////////////////////
 // ******    MAIN LOOP     ******** //
 //////////////////////////////////////
-int currentMode = 0;
+int currentMode = 2;
 int totalModes = 7;
 int modeToggle = 1;
 void drawFrame() {

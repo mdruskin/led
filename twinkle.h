@@ -44,9 +44,9 @@ namespace twinkle {
       if (soundBurst) numTwinkles += additionalSoundTwinkles;
 
       for (int i = 0; i < numTwinkles; i++) {
-        byte twinkleHeat = random16(50, 255);
-        byte twinkleLocation = random16(1, NUM_LEDS - 1);
-        byte twinkleHue = random16(startHue, startHue + hueRange);
+        byte twinkleHeat = random8(50, 255);
+        int twinkleLocation = random16(1, NUM_LEDS - 1);
+        byte twinkleHue = random8(startHue, startHue + hueRange);
         heat[twinkleLocation] = twinkleHeat;
         heat[twinkleLocation + 1] = twinkleHeat / 2;
         heat[twinkleLocation - 1] = twinkleHeat / 2;
