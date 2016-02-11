@@ -32,16 +32,19 @@ void setup() {
 //////////////////////////////////////
 // ******    MAIN LOOP     ******** //
 //////////////////////////////////////
-int currentMode = 2;
+long modeMs = 0;
+// 60 minutes
+//long modePeriod = 60 * 60 * 1000;
+long modePeriod = 3 * 1000;
+
+int currentMode = 0;
 int totalModes = 7;
 int modeToggle = 1;
-void drawFrame() {
-  if (isButtonToggle(modeToggle, MODE_BUTTON_PIN)) {
-    currentMode = (currentMode + 1) % totalModes;
-    Serial.print("New Mode:");
-    Serial.println(currentMode);
-  }
-  switch (currentMode) {
+
+int currentPattern = 0;
+
+void usePattern(int n) {
+  switch (n) {
     case 0:
       movingRainbow::draw(leds, 20);
       break;
@@ -63,6 +66,22 @@ void drawFrame() {
     case 6:
       accordian::draw(leds);
       break;
+  }
+}
+
+void drawFrame() {
+  if (isButtonToggle(modeToggle, MODE_BUTTON_PIN)) {
+    currentMode = (currentMode + 1) % totalModes;
+    Serial.print("New Mode:");
+    Serial.println(currentMode);
+  }
+  if (currentMode == 0) {
+    if (periodToggle(modeMs, modePeriod)) {
+      currentPattern = (currentPattern + 1) % totalModes;
+    }
+    usePattern(currentPattern);
+  } else {
+    usePattern(currentMode - 1);
   }
   adjustBrightness();
 }
