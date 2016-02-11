@@ -35,7 +35,7 @@ void setup() {
 long modeMs = 0;
 // 60 minutes
 //long modePeriod = 60 * 60 * 1000;
-long modePeriod = 3 * 1000;
+long modePeriod = 30 * 1000;
 
 int currentMode = 0;
 int totalModes = 7;
