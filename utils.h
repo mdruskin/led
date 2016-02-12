@@ -73,7 +73,7 @@ int isSoundOn() {
 // ****** adjustBrightness ******** //
 //////////////////////////////////////
 int brightnessButtonToggle = 1;
-byte brightness = 4;
+byte brightness = 3;
 byte brightnessValues[] = { 4, 8, 16, 32, 64, 128, 255 };
 void adjustBrightness() {
   if (isButtonToggle(brightnessButtonToggle, BRIGHTNESS_BUTTON_PIN)) {

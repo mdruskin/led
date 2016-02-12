@@ -31,7 +31,11 @@ namespace twinkle {
     // Cool everything down
     if (periodToggle(lastCoolingMillis, coolingPeriodMillis)) {
       for (int i = 0; i < NUM_LEDS; i++) {
-        heat[i] = qsub8(heat[i], cooling); // subtract until 0
+        // cool down more when heat already high
+        if (heat[i] > 128)
+          heat[i] = qsub8(heat[i], cooling * 2); // subtract until 0
+        else
+          heat[i] = qsub8(heat[i], cooling); // subtract until 0
       }
     }
 

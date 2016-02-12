@@ -1,5 +1,5 @@
 #define LOOP_DELAY 5
-#define BRIGHTNESS 64
+#define BRIGHTNESS 32
 #define NUM_LEDS 480
 #define LED_PIN 4
 #define BRIGHTNESS_BUTTON_PIN 6
@@ -71,16 +71,17 @@ void usePattern(int n) {
 
 void drawFrame() {
   if (isButtonToggle(modeToggle, MODE_BUTTON_PIN)) {
-    currentMode = (currentMode + 1) % totalModes;
+    currentMode = (currentMode + 1) % (totalModes + 1);
     Serial.print("New Mode:");
     Serial.println(currentMode);
   }
+  // demo mode - cycle all of them
   if (currentMode == 0) {
     if (periodToggle(modeMs, modePeriod)) {
       currentPattern = (currentPattern + 1) % totalModes;
     }
     usePattern(currentPattern);
-  } else {
+  } else { // or specific pattern
     usePattern(currentMode - 1);
   }
   adjustBrightness();
