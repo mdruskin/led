@@ -34,11 +34,11 @@ void setup() {
 //////////////////////////////////////
 long modeMs = 0;
 // 60 minutes
-//long modePeriod = 60 * 60 * 1000;
-long modePeriod = 30 * 1000;
+long modePeriod = 60 * 60 * 1000;
+//long modePeriod = 30 * 1000;
 
 int currentMode = 0;
-int totalModes = 7;
+int totalModes = 6;
 int modeToggle = 1;
 
 int currentPattern = 0;
